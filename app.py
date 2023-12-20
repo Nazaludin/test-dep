@@ -109,10 +109,10 @@ def chatbot_one(input_text):
 counter = 0
 
 
-def chatbot_two(prompt):
-    conversation = Conversation(prompt)
-    chatbot_response = chatbot(conversation)
-    return chatbot_response.generated_responses[-1]
+# def chatbot_two(prompt):
+#     conversation = Conversation(prompt)
+#     chatbot_response = chatbot(conversation)
+#     return chatbot_response.generated_responses[-1]
 
 
 def is_common_question(user_input):
@@ -170,9 +170,9 @@ def chatbot_page():
         if is_common_question(user_input):
             response_chat = chatbot_one(user_input)
             st.session_state['history'].append(("Chatbot 1", response_chat))
-        else:
-            response_chat = chatbot_two(user_input)
-            st.session_state['history'].append(("Chatbot 2", response_chat))
+        # else:
+        #     response_chat = chatbot_two(user_input)
+        #     st.session_state['history'].append(("Chatbot 2", response_chat))
 
     # Display chat history
     for speaker, message in st.session_state['history']:
