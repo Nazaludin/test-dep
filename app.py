@@ -3,13 +3,25 @@ import nltk
 import ssl
 import streamlit as st 
 import random
+from PIL import Image
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from transformers import pipeline, Conversation
 
 ssl._create_default_https_context = ssl._create_unverified_context
 nltk.data.path.append(os.path.abspath("nltk_data"))
 nltk.download('punkt')
 
+st.set_page_config(
+    page_title="Chatbot",
+    page_icon="💬",
+    layout="centered",
+    initial_sidebar_state="auto",
+)
+
+
+conversation_history = []
+chatbot = pipeline("conversational", model="facebook/blenderbot-400M-distill")
 intents = [
     {
         "tag": "greeting1",
@@ -80,34 +92,118 @@ x = vectorizer.fit_transform(patterns)
 y = tags
 clf.fit(x, y)
 
-def chatbot(input_text):
+def chatbot_one(input_text):
     input_text = vectorizer.transform([input_text])
     tag = clf.predict(input_text)[0]
+    
     for intent in intents:
         if intent['tag'] == tag:
             response = random.choice(intent['responses'])
             return response
+    
+    # Jika tidak ada respons yang sesuai dengan tag yang diprediksi
+    return "Maaf, saya tidak mengerti pertanyaan Anda saat ini."
         
 counter = 0
 
-def main():
-    global counter
-    st.title("S-Chatbot")
-    st.write("Welcome to the chatbot. Please type a message and press Enter to start the conversation.")
+def chatbot_two(prompt):
+    conversation = Conversation(prompt)
+    chatbot_response = chatbot(conversation)
+    return chatbot_response.generated_responses[-1]
 
-    counter += 1
-    user_input = st.text_input("You:", key=f"user_input_{counter}")
+def is_common_question(user_input):
+    for intent in intents:
+        for pattern in intent['patterns']:
+            if pattern.lower() in user_input.lower():
+                return True
+    return False
+
+def main():
+    menu_options = ['Home', 'About', 'Profile']
+    selected_option = st.sidebar.selectbox('Menu', menu_options)
+
+    if selected_option == 'About':
+        about()
+    if selected_option == 'Home': 
+        chatbot()
+    if selected_option == 'Profile': 
+        profile()
+
+  # Add a placeholder to ensure space at the bottom of sidebar
+    st.sidebar.markdown('<div style="height: 200px;"></div>', unsafe_allow_html=True)
+
+    # Add a short description about the developer at the bottom of the sidebar
+    st.sidebar.markdown(
+        """
+        <div style="position: fixed; bottom: 0; width: 200px;">
+            <hr style="margin: 0;">
+            <h2 style="font-style: italic; font-size: 12px;">👨‍💻 Developer</h2>
+            <h4 style="font-size: 12px;">About the Chatbot</h4>
+            <p style="font-size: 12px;">This chatbot was developed by Nazaludin using Streamlit. It utilizes a model trained on 400 million Facebook public domain conversations.</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+def chatbot():
+    st.title("Naza Chatbot")
+    st.write("Please type a message and press Enter to start the conversation.")
+    st.divider()
+
+    if 'history' not in st.session_state:
+        st.session_state['history'] = []
+
+    user_input = st.chat_input("Say something")
+
+    response_chat = ""  # Initialize response_chat outside the conditional blocks
 
     if user_input:
-        response = chatbot(user_input)
-        st.text_area("S-Chatbot:", value=response, height=100, max_chars=None, key=f"chatbot_response_{counter}")
+        st.session_state['history'].append(("User", user_input))
 
-        if response.lower() in ['goodbye', 'bye']:
-            st.write("Thank you for chatting with me. Have a great day!")
-            st.stop()
+        if is_common_question(user_input):
+            response_chat = chatbot_one(user_input)
+            st.session_state['history'].append(("Chatbot 1", response_chat))
+        else:
+            response_chat = chatbot_two(user_input)
+            st.session_state['history'].append(("Chatbot 2", response_chat))
+
+    # Display chat history
+    for speaker, message in st.session_state['history']:
+        if speaker == "User":
+            with st.chat_message("user"):
+                st.write(f"You: {message}")
+        else:
+            with st.chat_message("assistant"):
+                st.write(f"Assistant: {message}")
+
+
+def about():
+    st.title('About')
+    
+    st.title("Welcome to this Chatbot!")
+    st.write("We are here to provide you with a responsive and informative service.")
+    st.write("This chatbot has been designed with advanced technology that enables quick and relevant responses to your questions or needs. With the use of innovative Natural Language Processing (NLP) technology, this chatbot is able to understand the context of the conversation better, thus providing more appropriate and precise answers.")
+    st.write("We are committed to continuously improving the capabilities of this chatbot to make it more responsive and adaptive to your needs. Every interaction you have with this chatbot helps us to continue to enrich and develop its capabilities.")
+    st.write("Feel free to ask questions or share what you need from this chatbot. We are here to help you!")
+
+def profile():
+    st.title('Profil')
+    
+    # Path menuju gambar di folder src
+    image_path = "src/nazaludin.png"  # Ganti dengan path menuju gambar yang Anda miliki
+    
+    # Tampilkan gambar dengan PIL dan Streamlit
+    image = Image.open(image_path)
+    st.image(image, width=200)
+    st.write("Nazaludin Nur Rahmat")
+    st.write("21537141030")
+    st.write("S1 - Teknologi Informasi")
+   
+
+
+
 
 if __name__ == '__main__':
     main()
-    
     
     
