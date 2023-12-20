@@ -1,7 +1,7 @@
 import os
 import nltk
 import ssl
-import streamlit as st 
+import streamlit as st
 import random
 from PIL import Image
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -28,7 +28,7 @@ intents = [
         "patterns": ["Hi", "Hello", "Hey"],
         "responses": ["Hi there", "Hello", "Hey"]
     },
-     {
+    {
         "tag": "greeting2",
         "patterns": ["How are you?"],
         "responses": ["I'm fine, Thank you"]
@@ -92,24 +92,28 @@ x = vectorizer.fit_transform(patterns)
 y = tags
 clf.fit(x, y)
 
+
 def chatbot_one(input_text):
     input_text = vectorizer.transform([input_text])
     tag = clf.predict(input_text)[0]
-    
+
     for intent in intents:
         if intent['tag'] == tag:
             response = random.choice(intent['responses'])
             return response
-    
+
     # Jika tidak ada respons yang sesuai dengan tag yang diprediksi
     return "Maaf, saya tidak mengerti pertanyaan Anda saat ini."
-        
+
+
 counter = 0
+
 
 def chatbot_two(prompt):
     conversation = Conversation(prompt)
     chatbot_response = chatbot(conversation)
     return chatbot_response.generated_responses[-1]
+
 
 def is_common_question(user_input):
     for intent in intents:
@@ -118,19 +122,21 @@ def is_common_question(user_input):
                 return True
     return False
 
+
 def main():
     menu_options = ['Home', 'About', 'Profile']
     selected_option = st.sidebar.selectbox('Menu', menu_options)
 
     if selected_option == 'About':
         about()
-    if selected_option == 'Home': 
-        chatbot()
-    if selected_option == 'Profile': 
+    if selected_option == 'Home':
+        chatbot_page()
+    if selected_option == 'Profile':
         profile()
 
   # Add a placeholder to ensure space at the bottom of sidebar
-    st.sidebar.markdown('<div style="height: 200px;"></div>', unsafe_allow_html=True)
+    st.sidebar.markdown('<div style="height: 200px;"></div>',
+                        unsafe_allow_html=True)
 
     # Add a short description about the developer at the bottom of the sidebar
     st.sidebar.markdown(
@@ -145,7 +151,8 @@ def main():
         unsafe_allow_html=True
     )
 
-def chatbot():
+
+def chatbot_page():
     st.title("Naza Chatbot")
     st.write("Please type a message and press Enter to start the conversation.")
     st.divider()
@@ -179,31 +186,28 @@ def chatbot():
 
 def about():
     st.title('About')
-    
+
     st.title("Welcome to this Chatbot!")
     st.write("We are here to provide you with a responsive and informative service.")
     st.write("This chatbot has been designed with advanced technology that enables quick and relevant responses to your questions or needs. With the use of innovative Natural Language Processing (NLP) technology, this chatbot is able to understand the context of the conversation better, thus providing more appropriate and precise answers.")
     st.write("We are committed to continuously improving the capabilities of this chatbot to make it more responsive and adaptive to your needs. Every interaction you have with this chatbot helps us to continue to enrich and develop its capabilities.")
     st.write("Feel free to ask questions or share what you need from this chatbot. We are here to help you!")
 
+
 def profile():
     st.title('Profil')
-    
+
     # Path menuju gambar di folder src
-    image_path = "src/nazaludin.png"  # Ganti dengan path menuju gambar yang Anda miliki
-    
+    # Ganti dengan path menuju gambar yang Anda miliki
+    image_path = "src/nazaludin.png"
+
     # Tampilkan gambar dengan PIL dan Streamlit
     image = Image.open(image_path)
     st.image(image, width=200)
     st.write("Nazaludin Nur Rahmat")
     st.write("21537141030")
     st.write("S1 - Teknologi Informasi")
-   
-
-
 
 
 if __name__ == '__main__':
     main()
-    
-    
