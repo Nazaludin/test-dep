@@ -10,7 +10,19 @@ from transformers import pipeline, Conversation
 
 ssl._create_default_https_context = ssl._create_unverified_context
 nltk.data.path.append(os.path.abspath("nltk_data"))
-nltk.download('punkt')
+try:
+    # Coba download 'punkt'
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    # Jika 'punkt' belum didownload, download sekarang
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
+
+    nltk.download('punkt')
 
 st.set_page_config(
     page_title="Chatbot",
@@ -109,10 +121,10 @@ def chatbot_one(input_text):
 counter = 0
 
 
-# def chatbot_two(prompt):
-#     conversation = Conversation(prompt)
-#     chatbot_response = chatbot(conversation)
-#     return chatbot_response.generated_responses[-1]
+def chatbot_two(prompt):
+    conversation = Conversation(prompt)
+    chatbot_response = chatbot(conversation)
+    return chatbot_response.generated_responses[-1]
 
 
 def is_common_question(user_input):
@@ -170,9 +182,9 @@ def chatbot_page():
         if is_common_question(user_input):
             response_chat = chatbot_one(user_input)
             st.session_state['history'].append(("Chatbot 1", response_chat))
-        # else:
-        #     response_chat = chatbot_two(user_input)
-        #     st.session_state['history'].append(("Chatbot 2", response_chat))
+        else:
+            response_chat = chatbot_two(user_input)
+            st.session_state['history'].append(("Chatbot 2", response_chat))
 
     # Display chat history
     for speaker, message in st.session_state['history']:
