@@ -22,7 +22,7 @@ except LookupError:
     else:
         ssl._create_default_https_context = _create_unverified_https_context
 
-    nltk.download('punkt')
+    nltk.download('all')
 
 st.set_page_config(
     page_title="Chatbot",
