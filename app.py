@@ -1,5 +1,5 @@
 import os
-import nltk
+# import nltk
 import ssl
 import streamlit as st
 import random
@@ -8,28 +8,29 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from transformers import pipeline, Conversation
 
-ssl._create_default_https_context = ssl._create_unverified_context
-nltk.data.path.append(os.path.abspath("nltk_data"))
-try:
-    # Coba download 'punkt'
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    # Jika 'punkt' belum didownload, download sekarang
-    try:
-        _create_unverified_https_context = ssl._create_unverified_context
-    except AttributeError:
-        pass
-    else:
-        ssl._create_default_https_context = _create_unverified_https_context
+# ssl._create_default_https_context = ssl._create_unverified_context
+# nltk.data.path.append(os.path.abspath("nltk_data"))
+# try:
+#     # Coba download 'punkt'
+#     nltk.data.find('tokenizers/punkt')
+# except LookupError:
+#     # Jika 'punkt' belum didownload, download sekarang
+#     try:
+#         _create_unverified_https_context = ssl._create_unverified_context
+#     except AttributeError:
+#         pass
+#     else:
+#         ssl._create_default_https_context = _create_unverified_https_context
 
-    nltk.download('all')
+#     nltk.download('all')
 
-st.set_page_config(
-    page_title="Chatbot",
-    page_icon="💬",
-    layout="centered",
-    initial_sidebar_state="auto",
-)
+# st.set_page_config(
+#     page_title="Chatbot",
+#     page_icon="💬",
+#     layout="centered",
+#     initial_sidebar_state="auto",
+#     menu_items=['None']
+# )
 
 
 conversation_history = []
